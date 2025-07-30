@@ -119,7 +119,7 @@ func reboot(uuid string) {
 		panic(err)
 	}
 
-	if err := exec.Command("shutdown", "/r", "/t", "2").Run(); err != nil {
+	if err := exec.Command("shutdown", "/r", "/t", "0").Run(); err != nil {
 		panic(err)
 	}
 
