@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -39,14 +40,17 @@ func onReady() {
 	systray.SetIcon(icon)
 
 	for _, entry := range entries {
+		fmt.Println(entry.Attributes)
 		key := entry.Key
+		uuid := entry.Attributes["identifier"]
 		if desc, ok := entry.Attributes["description"]; ok {
 			key = desc
 		}
 		mCustom := systray.AddMenuItem(key, "Switch to"+key)
 		go func() {
 			<-mCustom.ClickedCh
-			reboot(entry.Attributes["identifier"])
+			fmt.Println(uuid)
+			reboot(uuid)
 		}()
 
 	}
@@ -103,8 +107,11 @@ func parse(out string) []Entry {
 		}
 		for _, l := range sec {
 			l = strings.Join(strings.Fields(l), " ")
-			val := strings.SplitN(l, " ", 1)
+			val := strings.Split(l, " ")
 			if len(val) != 2 {
+				if len(val) > 2 {
+					val[1] = strings.Join(val[1:], " ")
+				}
 				continue
 			}
 			entry.Attributes[val[0]] = val[1]
